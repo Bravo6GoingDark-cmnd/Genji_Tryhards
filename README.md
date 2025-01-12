@@ -2,6 +2,8 @@
 
 This is only for Genji Tryhards. Believe. 
 
+peak genji gameplay --> [Gameplay](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+
 Install the rep by installing git installer first on your image. Then run 
 
 git --version
