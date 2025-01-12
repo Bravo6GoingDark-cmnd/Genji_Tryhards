@@ -14,7 +14,7 @@ git --version
 to see if it is installed.
 
 Then do 
-git clone url          (no need for the <>)
+git clone url
 
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ← if powershell(admin) doesn't exec code
