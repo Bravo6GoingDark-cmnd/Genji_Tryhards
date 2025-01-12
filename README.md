@@ -1,11 +1,6 @@
 # Genji_Tryhards
 
 This is only for Genji Tryhards. Believe. 
-*
-*
-*
-*
-*
 
 Install the rep by installing git installer first on your image. Then run 
 
