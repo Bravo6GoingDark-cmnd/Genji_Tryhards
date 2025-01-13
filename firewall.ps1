@@ -1,3 +1,5 @@
+$user = 'ADJUST'
+
 #firewall settings
     'Firewall config start'
     Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
