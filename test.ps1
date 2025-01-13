@@ -1,85 +1,11 @@
 #adjust this variable below before running, leave the quotes
 $user = 'ADJUST'
-#setup
 
-'You chose the option NUKE THIS SHIT.....commencing...'    
-Start-Sleep -s 5
 'managing users'
 'grabbing users and user groups'
 net user > scripterino\users.txt
 
 net localgroup > scripterino\groups.txt
-
-#disabling guest/admin and renaming them
-'disabling Guest and Admin account'
-Get-LocalUser Guest | Disable-LocalUser
-Get-LocalUser Administrator | Disable-LocalUser
-'renaming guest and admin account'
-$adminAccount =Get-WMIObject Win32_UserAccount -Filter "Name='Administrator'"
-$result =$adminAccount.Rename("adminBOI")
-$guestAccount =Get-WMIObject Win32_UserAccount -Filter "Name='Guest'"
-$result =$guestAccount.Rename("guestBOI")
-
-
-
-#REKING PLEBS AND THEIR SHIT PASSWORDS
-'reking plebs and their shit passwords'
-get-wmiobject win32_useraccount | ForEach-Object {
-([adsi](“WinNT://”+$_.caption).replace(“\”,”/”)).SetPassword(“K3wLP@SsW0rd”)
-}
-
-#AUDIT BABY
-'STARTING audit m9, this might take a while'
-#account policies
-
-net accounts /UNIQUEPW:24 /MAXPWAGE:60 /MINPWAGE:1 /MINPWLEN:12 /lockoutthreshold:5
-
-
-#localpolicies-audit policies
-auditpol /set /category:"Account Logon" /success:enable #is everything really just success and failure?
-auditpol /set /category:"Account Logon" /failure:enable
-
-auditpol /set /category:"Account Management" /success:enable
-auditpol /set /category:"Account Management" /failure:enable
-
-auditpol /set /category:"DS Access" /success:enable
-auditpol /set /category:"DS Access" /failure:enable
-
-auditpol /set /category:"Logon/Logoff" /success:enable
-auditpol /set /category:"Logon/Logoff" /failure:enable
-
-auditpol /set /category:"Object Access" /success:enable
-auditpol /set /category:"Object Access" /failure:enable
-
-auditpol /set /category:"Policy Change" /success:enable
-auditpol /set /category:"Policy Change" /failure:enable
-
-auditpol /set /category:"Privilege Use" /success:enable
-auditpol /set /category:"Privilege Use" /failure:enable
-
-auditpol /set /category:"Detailed Tracking" /success:enable
-auditpol /set /category:"Detailed Tracking" /failure:enable
-
-auditpol /set /category:"System" /success:enable 
-auditpol /set /category:"System" /failure:enable
-
-#subcategories of advanced audit polcies
-
-
-#grabbing network shares check if irregular
-'grabbing shares bb'
-net share > scripterino\shares.txt
-
-
-#flush DNS
-'flushing dns cache'
-ipconfig /flushdns
-
-#Grabbing hosts file
-'grabbing hosts file'	
-New-Item -Path C:\Users\$user\Desktop\scripterino\hosts -ItemType directory
-Get-ChildItem -Path "C:\Windows\System32\drivers\etc\hosts" | Copy-Item -Destination C:\Users\$user\Desktop\scripterino\hosts
-
 
 'FEATURES BAAAABY'
 
@@ -137,83 +63,14 @@ dism /online /disable-feature /featurename:TelnetServer
 dism /online /disable-feature /featurename:"SMB1Protocol"
 Set-SmbServerConfiguration -EnableSMB1Protocol $false -Force
 
-#processes that have bigger loads
-'grabbing dem interesting process'
-Get-Process | Where-Object {$_.WorkingSet -gt 20000000} > scripterino\interestingprocess.txt
-
-#firewall settings
-'Firewall config start'
-Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
-Set-NetFirewallProfile -DefaultInboundAction Block -DefaultOutboundAction Allow -NotifyOnListen True -AllowUnicastResponseToMulticast True -LogFileName %SystemRoot%\System32\LogFiles\Firewall\pfirewall.log
-netsh advfirewall import "C:\Users\$user\Desktop\Win10Firewall.wfw"
-netsh advfirewall firewall set rule name="Remote Assistance (DCOM-In)" new enable=no 
-netsh advfirewall firewall set rule name="Remote Assistance (PNRP-In)" new enable=no 
-netsh advfirewall firewall set rule name="Remote Assistance (RA Server TCP-In)" new enable=no 
-netsh advfirewall firewall set rule name="Remote Assistance (SSDP TCP-In)" new enable=no 
-netsh advfirewall firewall set rule name="Remote Assistance (SSDP UDP-In)" new enable=no 
-netsh advfirewall firewall set rule name="Remote Assistance (TCP-In)" new enable=no 
-netsh advfirewall firewall set rule name="Telnet Server" new enable=no 
-netsh advfirewall firewall set rule name="netcat" new enable=no
-#disable network discovery hopefully
-netsh advfirewall firewall set rule group="Network Discovery" new enable=No
-#disable file and printer sharing hopefully
-netsh advfirewall firewall set rule group="File and Printer Sharing" new enable=No
-
-netsh advfirewall firewall add rule name="block_RemoteRegistry_in" dir=in service="RemoteRegistry" action=block enable=yes
-netsh advfirewall firewall add rule name="block_RemoteRegistry_out" dir=out service="RemoteRegistry" action=block enable=yes
-
-New-NetFirewallRule -DisplayName "sshTCP" -Direction Inbound -LocalPort 22 -Protocol TCP -Action Block #ssh
-New-NetFirewallRule -DisplayName "ftpTCP" -Direction Inbound -LocalPort 21 -Protocol TCP -Action Block #ftp
-New-NetFirewallRule -DisplayName "telnetTCP" -Direction Inbound -LocalPort 23 -Protocol TCP -Action Block #telnet
-New-NetFirewallRule -DisplayName "SMTPTCP" -Direction Inbound -LocalPort 25 -Protocol TCP -Action Block #SMTP
-New-NetFirewallRule -DisplayName "POP3TCP" -Direction Inbound -LocalPort 110 -Protocol TCP -Action Block #POP3
-New-NetFirewallRule -DisplayName "SNMPTCP" -Direction Inbound -LocalPort 161 -Protocol TCP -Action Block #SNMP
-New-NetFirewallRule -DisplayName "RDPTCP" -Direction Inbound -LocalPort 3389 -Protocol TCP -Action Block #RDP
-
 #network profile to public so it denies file sharing, device discovery, etc.
 Set-NetConnectionProfile -NetworkCategory Public
 Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\NetworkList\Signatures\010103000F0000F0010000000F0000F0C967A3643C3AD745950DA7859209176EF5B87C875FA20DF21951640E807D7C24" -Name "Category" -ErrorAction SilentlyContinue
 
 
-
 'starting registry cancer'  
 Start-Sleep -s 2
 
-#disable remote desktop
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 1 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v AllowTSConnections /t REG_DWORD /d 0 /f
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fAllowToGetHelp /t REG_DWORD /d 0 /f
-reg add "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "AllowSignedFiles" /t REG_DWORD /d 0 /f
-reg add "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "AllowUnsignedFiles" /t REG_DWORD /d 0 /f
-reg add "HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows NT\Terminal Services" /v "DisablePasswordSaving" /t REG_DWORD /d 1 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Conferencing" /v "NoRDS" /t REG_DWORD /d 1 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service\WinRS" /v "AllowRemoteShellAccess" /t REG_DWORD /d 0 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" /v "AllowSignedFiles" /t REG_DWORD /d 0 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" /v "AllowUnsignedFiles" /t REG_DWORD /d 0 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" /v "CreateEncryptedOnlyTickets" /t REG_DWORD /d 1 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" /v "DisablePasswordSaving" /t REG_DWORD /d 1 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" /v "fAllowToGetHelp" /t REG_DWORD /d 0 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" /v "fAllowUnsolicited" /t REG_DWORD /d 0 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" /v "fDenyTSConnections" /t REG_DWORD /d 1 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client" /v "fEnableUsbBlockDeviceBySetupClass" /t REG_DWORD /d 1 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client" /v "fEnableUsbNoAckIsochWriteToDevice" /t REG_DWORD /d 80 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client" /v "fEnableUsbSelectDeviceByInterface" /t REG_DWORD /d 1 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile\RemoteAdminSettings" /v "Enabled" /t REG_DWORD /d 0 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile\Services\RemoteDesktop" /v "Enabled" /t REG_DWORD /d 0 /f
-reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\WindowsFirewall\StandardProfile\Services\UPnPFramework" /v "Enabled" /t REG_DWORD /d 0 /f
-
-
-#Windows automatic updates
-reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU /v AutoInstallMinorUpdates /t REG_DWORD /d 1 /f
-reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU /v NoAutoUpdate /t REG_DWORD /d 0 /f
-reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU /v AUOptions /t REG_DWORD /d 4 /f
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update" /v AUOptions /t REG_DWORD /d 4 /f
-reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /v DisableWindowsUpdateAccess /t REG_DWORD /d 0 /f
-reg add HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate /v ElevateNonAdmins /t REG_DWORD /d 0 /f
-reg add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer /v NoWindowsUpdate /t REG_DWORD /d 0 /f
-reg add "HKLM\SYSTEM\Internet Communication Management\Internet Communication" /v DisableWindowsUpdateAccess /t REG_DWORD /d 0 /f
-reg add HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\WindowsUpdate /v DisableWindowsUpdateAccess /t REG_DWORD /d 0 /f
 
 #Restrict CD ROM drive
 reg ADD "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" /v AllocateCDRoms /t REG_DWORD /d 1 /f
