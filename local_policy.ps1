@@ -37,3 +37,12 @@ secpol.msc /configure /LetEveryonePermissionsApplyToAnonymousUser:0
 secpol.msc /configure /NoLMHash:1
 secpol.msc /configure /AdminApprovalModePromptOnSecureDesktop:1
 secpol.msc /configure /CreateTokenObject:None
+
+#Local Group Policy
+# Enable Windows Defender SmartScreen to prompt for warning
+reg ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\SmartScreen" /v Enabled /t REG_DWORD /d 1 /f
+reg ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\SmartScreen" /v PromptOnHighRisk /t REG_DWORD /d 1 /f
+
+# Disable AutoPlay for all drives
+reg ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoAutoplay /t REG_DWORD /d 1 /f
+reg ADD "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoAutoplayForNonVolume /t REG_DWORD /d 1 /f
