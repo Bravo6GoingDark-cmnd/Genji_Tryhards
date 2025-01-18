@@ -1,17 +1,17 @@
-#disabling guest/admin and renaming them
-    'disabling Guest and Admin account'
-    Get-LocalUser Guest | Disable-LocalUser
-    Get-LocalUser Administrator | Disable-LocalUser
-    'renaming guest and admin account'
-    $adminAccount =Get-WMIObject Win32_UserAccount -Filter "Name='Administrator'"
-    $result =$adminAccount.Rename("adminBOI")
-    $guestAccount =Get-WMIObject Win32_UserAccount -Filter "Name='Guest'"
-    $result =$guestAccount.Rename("guestBOI")
+# Disabling Guest and Admin accounts
+'Disabling Guest and Admin accounts'
+Disable-LocalUser -Name 'Guest'
+Disable-LocalUser -Name 'Administrator'
 
+# Renaming Guest and Admin accounts
+'Renaming Guest and Admin accounts'
+Rename-LocalUser -Name 'Administrator' -NewName 'Cyberadmin'
+Rename-LocalUser -Name 'Guest' -NewName 'Cyberguest'
 
-#REKING PLEBS AND THEIR SHIT PASSWORDS
-    'reking plebs and their shit passwords'
-    get-wmiobject win32_useraccount | ForEach-Object {
-    ([adsi](“WinNT://”+$_.caption).replace(“\”,”/”)).SetPassword(“CyberPatriot@123”)      #change the password to whatever you want other plebs passwords to be.
-    }
-
+# Updating passwords for all local user accounts
+'Updating passwords for all local user accounts'
+$users = Get-LocalUser
+foreach ($user in $users) {
+    $password = ConvertTo-SecureString -String 'CyberPatriot@123' -AsPlainText -Force
+    Set-LocalUser -Name $user.Name -Password $password
+}
