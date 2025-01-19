@@ -18,8 +18,6 @@ auditpol /set /category:"System" /success:enable /failure:enable
 Get-LocalUser -Name "Administrator" | Disable-LocalUser
 Get-LocalUser -Name "Guest" | Disable-LocalUser
 
-Get-LocalUser -Name "Guest" | Disable-LocalUser
-
 #Local security policy
 secpol.msc /configure /PasswordComplexity:1
 secpol.msc /configure /RestrictCDRomAccess:1
