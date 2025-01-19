@@ -1,5 +1,5 @@
 # Account Policies
-net accounts /UNIQUEPW:24 /MAXPWAGE:90 /MINPWAGE:1 /MINPWLEN:14 /lockoutthreshold:5 /lockoutduration:30 /lockoutbadcount:5 /passwordhistory:24 /ForceLogoffWhenHourExpire:1
+net accounts /UNIQUEPW:24 /MAXPWAGE:90 /MINPWAGE:1 /MINPWLEN:10 /lockoutthreshold:5 /lockoutduration:30 /lockoutbadcount:5 /passwordhistory:24 /ForceLogoffWhenHourExpire:1
 
 # Audit Policies
 auditpol /set /category:"Account Logon" /success:enable /failure:enable
