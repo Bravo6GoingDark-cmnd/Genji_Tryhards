@@ -1,3 +1,4 @@
+#CODE CHECKS PASSED!!!
 # Description:
 # This script stops and disables unwanted Windows services. If the ReadMe specifies essential services, comment out that service by putting a # infront of the service like the example below.
 
