@@ -13,5 +13,5 @@ Save the file as specified on this repo.        Ex:        Here -> tasks.ps1    
 8. Run interesting file.ps1 **Try to run it at the end. You won't need this. Use Malwarebytes or something.**
 9. Run test.ps1 **BE CAREFUL WITH THIS SCRIPT**
 10. Run auto_update.
-11. Run reg_editor.ps1. **Be careful with this one too**
-12. Run unwanted_filedumpre.ps1    **THIS IS NOT REQUIRED. AGAIN, USE MALWAREBYTES.**
+11. Run reg_editor.ps1. _**Be careful with this one too**_
+12. Run unwanted_filedumpre.ps1    _**THIS IS NOT REQUIRED. AGAIN, USE MALWAREBYTES.**_
