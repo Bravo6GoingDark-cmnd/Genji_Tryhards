@@ -1,3 +1,4 @@
+#CHECKS NOT COMPLETED FOR THIS CODE
 #You must check all of this with your readme and then run this.
 # Secure Kerberos Maximum Lifetime for Service Ticket
 Write-Host "Configuring Kerberos Maximum Lifetime for Service Ticket..."
