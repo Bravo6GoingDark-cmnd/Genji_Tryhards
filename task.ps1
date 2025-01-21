@@ -1,4 +1,4 @@
-#CHECK
+#TESTING NOT COMPLETE
 # Function to disable scheduled tasks
 Function Disable-Tasks {
     Unregister-ScheduledTask -TaskPath *Bluetooth* -ErrorAction SilentlyContinue
