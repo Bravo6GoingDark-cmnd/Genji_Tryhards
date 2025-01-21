@@ -1,4 +1,4 @@
-#CODE NOT CHECKED
+:: # TESTING NOT COMPLETE
 @echo off
 :: Enable color in the terminal
 echo.
