@@ -15,3 +15,5 @@ git clone url
 
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass ← if powershell(admin) doesn't exec code
+
+_**CHECK OUT STARTER.MD IT GUIDES YOU THROUGH THIS REPO**_
