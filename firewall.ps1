@@ -1,4 +1,4 @@
-#TESTING NOT COMPLETE
+#DON'T USE. TESTING FAILED
 # Get the username of the currently logged-in user
 $user = $env:USERNAME
 
