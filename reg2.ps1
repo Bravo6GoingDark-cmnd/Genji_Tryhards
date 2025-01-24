@@ -1,9 +1,16 @@
-#CHECKS NOT COMPLETED FOR THIS CODE
-#You must check all of this with your readme and then run this.
+#TAKE SNAPSHOT BEFORE USING THIS!!!!!
+# Ensure C:\Temp exists
+if (-not (Test-Path "C:\Temp")) {
+    New-Item -Path "C:\Temp" -ItemType Directory
+}
+
 # Secure Kerberos Maximum Lifetime for Service Ticket
 Write-Host "Configuring Kerberos Maximum Lifetime for Service Ticket..."
 Import-Module ActiveDirectory
-Set-ADDefaultDomainPasswordPolicy -Domain (Get-ADDomain).DNSRoot -MaxTicketAge 04:00:00  # 4 hours
+
+# Set Kerberos Max Ticket Age (4 hours)
+# Use Group Policy or modify krbtgt directly (instead of Set-ADKerberosPolicy)
+Set-ADObject -Identity "CN=krbtgt,CN=Users,DC=YourDomain,DC=com" -Replace @{MaxTicketAge = "04:00:00"}
 
 # Enable Audit Process Creation [Success]
 Write-Host "Enabling Audit Process Creation (Success)..."
@@ -16,8 +23,13 @@ Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies
 # Domain Users may not enable computer and user accounts to be trusted for delegation
 Write-Host "Removing 'Enable computer and user accounts to be trusted for delegation' for Domain Users..."
 secedit /export /cfg "C:\Temp\SecurityConfig.inf"
-(Get-Content "C:\Temp\SecurityConfig.inf") -replace "SeEnableDelegationPrivilege = .*", "SeEnableDelegationPrivilege = " | Set-Content "C:\Temp\SecurityConfig.inf"
-secedit /configure /db secedit.sdb /cfg "C:\Temp\SecurityConfig.inf" /areas USER_RIGHTS
+if (Test-Path "C:\Temp\SecurityConfig.inf") {
+    (Get-Content "C:\Temp\SecurityConfig.inf") -replace "SeEnableDelegationPrivilege = .*", "SeEnableDelegationPrivilege = " | Set-Content "C:\Temp\SecurityConfig.inf"
+    secedit /configure /db secedit.sdb /cfg "C:\Temp\SecurityConfig.inf" /areas USER_RIGHTS
+} else {
+    Write-Host "SecurityConfig.inf not found. Exiting script."
+    exit
+}
 
 # Administrators may not act as part of the operating system
 Write-Host "Disabling 'Act as part of the operating system' for Administrators..."
@@ -42,27 +54,45 @@ Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies
 
 # Remove Everyone full share permissions from SYSVOL
 Write-Host "Removing 'Everyone' full share permissions from SYSVOL..."
-$acl = Get-Acl -Path "\\<DomainName>\SYSVOL"
-$acl.RemoveAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule("Everyone", "FullControl", "Allow")))
-Set-Acl -Path "\\<DomainName>\SYSVOL" -AclObject $acl
+$sysvolPath = "\\example.com\SYSVOL"  # Replace with your actual domain
+if (Test-Path $sysvolPath) {
+    $acl = Get-Acl -Path $sysvolPath
+    $acl.RemoveAccessRule((New-Object System.Security.AccessControl.FileSystemAccessRule("Everyone", "FullControl", "Allow")))
+    Set-Acl -Path $sysvolPath -AclObject $acl
+} else {
+    Write-Host "SYSVOL path not found. Exiting script."
+    exit
+}
 
-# Disable AD Certificate Services
+# Disable AD Certificate Services (Only if installed)
 Write-Host "Disabling Active Directory Certificate Services..."
-Stop-Service CertSvc
-Set-Service CertSvc -StartupType Disabled
+if (Get-Service -Name "CertSvc" -ErrorAction SilentlyContinue) {
+    Stop-Service CertSvc
+    Set-Service CertSvc -StartupType Disabled
+} else {
+    Write-Host "Active Directory Certificate Services not found."
+}
 
-# Disable Windows Fax Service
+# Disable Windows Fax Service (Only if installed)
 Write-Host "Disabling Windows Fax Service..."
-Stop-Service Fax
-Set-Service Fax -StartupType Disabled
+if (Get-Service -Name "Fax" -ErrorAction SilentlyContinue) {
+    Stop-Service Fax
+    Set-Service Fax -StartupType Disabled
+} else {
+    Write-Host "Windows Fax Service not found."
+}
 
-# Chrome blocks intrusive ads
+# Chrome blocks intrusive ads (Ensure registry path exists)
 Write-Host "Configuring Chrome to block intrusive ads..."
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Google\Chrome" -Name "DefaultAdsSetting" -Value 2
+$chromePath = "HKLM:\SOFTWARE\Policies\Google\Chrome"
+if (-not (Test-Path $chromePath)) {
+    New-Item -Path $chromePath -Force
+}
+Set-ItemProperty -Path $chromePath -Name "DefaultAdsSetting" -Value 2
 
 # Disable DNS zone transfers to any server
 Write-Host "Disabling DNS zone transfers to any server..."
-Set-DnsServerZoneTransferPolicy -Name "BlockZoneTransfers" -PolicyType Deny
+Set-DnsServerZoneTransferPolicy -ZoneName "YourDomainName" -PolicyType Deny  # Replace with your actual domain
 
 # Disable anonymous LDAP bind
 Write-Host "Disabling anonymous LDAP bind..."
