@@ -1,4 +1,5 @@
 :: # TESTING NOT COMPLETE
+:: # CHECK YOUR LOCAL POLICY AFTER RUNNING IF THEY CHANGED OR NOT.
 @echo off
 :: Enable color in the terminal
 echo.
