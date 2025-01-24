@@ -1,4 +1,7 @@
-:: ALL CODES(FROM THIS DIRECTORY) ARE PRESENT HERE 
+::DON'T USE THIS. WORK IN PROGRESS. MAY CRASH EVERYTHIN
+
+
+
 @echo off
 rem Main Script
 
@@ -51,10 +54,9 @@ for %%a in (%services%) do (
     if %ERRORLEVEL% equ 1 (
         echo Setting %%a to manual mode...
         sc config "%%a" start=manual >nul 2>&1
-    ) else (
+    ) else if %ERRORLEVEL% equ 2 (
         echo Skipping %%a...
     )
 )
 echo *** Finished Manual Mode                                                        ***
 echo ------------------------------------------------------------------------------------
-
