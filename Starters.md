@@ -3,7 +3,7 @@ _**Do the Forensic Questions before running these and you must read the readme b
 
 Save the file as specified on this repo.        Ex:        Here -> tasks.ps1        U Save as -> tasks.ps1
 
-1. Start with recommended policies. Copy-paste the contents into a notepad and save it as .inf file. Then run it as admin in powershell.
+~~1. Start with recommended policies. Copy-paste the contents into a notepad and save it as .inf file. Then run it as admin in powershell.~~
 2. Then run the local_policy.bat You just need to run it as an admin.
 3. Run firewall.ps1. If points are removed. check the reason and figure to undo it.
 4. Check if remotedesktop is required. If not, run Disable_remoteDesktop.ps1.
