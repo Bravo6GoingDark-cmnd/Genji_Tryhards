@@ -9,8 +9,5 @@ Function Disable-Tasks {
     Unregister-ScheduledTask -TaskPath '*Windows Error Reporting*' -ErrorAction SilentlyContinue
 }
 
-# Export the function so it can be used after importing the module
-Export-ModuleMember -Function Disable-Tasks
-
 # code calls the function to disable tasks right after loading the script
 Disable-Tasks
